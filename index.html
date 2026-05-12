@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quest Log — Claude × Ben</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; min-height: 100vh; }
+
+  .header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .header h1 { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #58a6ff; text-shadow: 0 0 10px #58a6ff40; }
+  .header .level { background: linear-gradient(135deg, #635BFF, #8b5cf6); padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; color: white; }
+  .xp-bar { width: 200px; height: 8px; background: #1a1a2e; border-radius: 4px; overflow: hidden; margin-left: auto; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, #635BFF, #a78bfa); width: 72%; border-radius: 4px; }
+  .xp-label { font-size: 10px; color: #666; margin-left: 8px; }
+
+  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #635BFF, #58a6ff, #635BFF); opacity: 0.6; }
+  .card h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .icon { font-size: 14px; }
+
+  .quest { padding: 10px 12px; margin-bottom: 8px; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+  .quest:hover { border-color: #58a6ff; background: #1c2533; }
+  .quest .quest-icon { font-size: 18px; }
+  .quest .quest-name { font-size: 13px; font-weight: 600; color: #e6edf3; }
+  .quest .quest-desc { font-size: 11px; color: #8b949e; margin-top: 2px; }
+  .quest .quest-status { margin-left: auto; font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+  .status-active { background: #0d4429; color: #3fb950; border: 1px solid #238636; }
+  .status-blocked { background: #3d1a1a; color: #f85149; border: 1px solid #da3633; }
+  .status-complete { background: #1a1a3d; color: #a78bfa; border: 1px solid #635BFF; }
+  .status-waiting { background: #3d2e00; color: #d29922; border: 1px solid #9e6a03; }
+
+  .trophy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .trophy { text-align: center; padding: 12px 8px; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; }
+  .trophy.earned { border-color: #d4a72c; background: #1c2128; }
+  .trophy.earned .trophy-icon { filter: none; }
+  .trophy .trophy-icon { font-size: 24px; filter: grayscale(1) opacity(0.3); }
+  .trophy .trophy-name { font-size: 9px; color: #8b949e; margin-top: 4px; display: block; }
+  .trophy.earned .trophy-name { color: #d4a72c; }
+
+  .stat-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .stat-box { flex: 1; text-align: center; padding: 12px; background: #1c2128; border-radius: 8px; }
+  .stat-box .num { font-size: 24px; font-weight: 700; color: #e6edf3; font-family: 'Inter', sans-serif; }
+  .stat-box .label { font-size: 10px; color: #8b949e; margin-top: 4px; }
+
+  .health-bar { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; }
+  .health-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .health-dot.ok { background: #3fb950; box-shadow: 0 0 6px #3fb95060; }
+  .health-dot.fail { background: #f85149; box-shadow: 0 0 6px #f8514960; }
+  .health-dot.warn { background: #d29922; box-shadow: 0 0 6px #d2992260; }
+
+  .archetype-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; margin: 3px; background: #1c2128; border: 1px solid #30363d; border-radius: 16px; font-size: 11px; }
+  .archetype-chip.used { border-color: #635BFF; color: #a78bfa; }
+  .archetype-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #30363d; }
+  .archetype-chip.used .chip-dot { background: #635BFF; }
+
+  .full-width { grid-column: 1 / -1; }
+  .footer { font-size: 10px; color: #30363d; text-align: center; margin-top: 24px; font-family: 'Press Start 2P', monospace; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚔️ QUEST LOG</h1>
+  <span class="level">LVL 41</span>
+  <div class="xp-bar"><div class="xp-fill"></div></div>
+  <span class="xp-label">72% to next level</span>
+</div>
+
+<!-- ACTIVE QUESTS -->
+<div class="grid">
+  <div class="card">
+    <h2><span class="icon">🗡️</span> Active Quests</h2>
+    <div class="quest">
+      <span class="quest-icon">📜</span>
+      <div>
+        <div class="quest-name">AWX Strategy Doc</div>
+        <div class="quest-desc">Three-pillar strategy for Jeff + Tanya. In reviewer pass.</div>
+      </div>
+      <span class="quest-status status-waiting">AWAITING REVIEW</span>
+    </div>
+    <div class="quest">
+      <span class="quest-icon">🖥️</span>
+      <div>
+        <div class="quest-name">Devbox Agent Setup</div>
+        <div class="quest-desc">Persistent background agents. CronCreate active, git repo pending.</div>
+      </div>
+      <span class="quest-status status-active">IN PROGRESS</span>
+    </div>
+    <div class="quest">
+      <span class="quest-icon">🧬</span>
+      <div>
+        <div class="quest-name">System Self-Improvement</div>
+        <div class="quest-desc">Archetypes, feedback memories, open-items consolidation.</div>
+      </div>
+      <span class="quest-status status-complete">COMPLETE</span>
+    </div>
+    <div class="quest">
+      <span class="quest-icon">🔗</span>
+      <div>
+        <div class="quest-name">Git Repo for Agents</div>
+        <div class="quest-desc">Push ~/agents to GitHub for durability.</div>
+      </div>
+      <span class="quest-status status-blocked">BLOCKED</span>
+    </div>
+    <div class="quest">
+      <span class="quest-icon">🔑</span>
+      <div>
+        <div class="quest-name">Fix Asana Auth</div>
+        <div class="quest-desc">PAT expired. Regen at Asana > Profile > Apps.</div>
+      </div>
+      <span class="quest-status status-blocked">NEEDS BEN</span>
+    </div>
+  </div>
+
+  <!-- STATS + HEALTH -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div class="card">
+      <h2><span class="icon">📊</span> Party Stats</h2>
+      <div class="stat-row">
+        <div class="stat-box"><div class="num">41</div><div class="label">Sessions</div></div>
+        <div class="stat-box"><div class="num">9</div><div class="label">Archetypes</div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="num">11</div><div class="label">Rules</div></div>
+        <div class="stat-box"><div class="num">21</div><div class="label">Open Items</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">❤️</span> System Health</h2>
+      <div class="health-bar"><div class="health-dot fail"></div> Morning Briefing (sc-2fa)</div>
+      <div class="health-bar"><div class="health-dot ok"></div> Nightly Prep</div>
+      <div class="health-bar"><div class="health-dot ok"></div> Catch-up Agent</div>
+      <div class="health-bar"><div class="health-dot fail"></div> Vault Gardener (FDA)</div>
+      <div class="health-bar"><div class="health-dot warn"></div> Devbox Crons (7d expiry)</div>
+      <div class="health-bar"><div class="health-dot fail"></div> Asana API (PAT dead)</div>
+    </div>
+  </div>
+</div>
+
+<!-- TROPHIES -->
+<div class="card" style="margin-bottom: 24px;">
+  <h2><span class="icon">🏆</span> Achievements</h2>
+  <div class="trophy-grid">
+    <div class="trophy earned">
+      <div class="trophy-icon">🧠</div>
+      <span class="trophy-name">First Blood</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">📚</div>
+      <span class="trophy-name">Lorekeeper (50+ ingests)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🏃</div>
+      <span class="trophy-name">Marathon Runner (15+ deliverables in one session)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">💀</div>
+      <span class="trophy-name">Nuke From Orbit (rebuilt from scratch 3x)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🧵</div>
+      <span class="trophy-name">Multithreaded (3 parallel sessions)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🔮</div>
+      <span class="trophy-name">Architect (Market Context Layer RFC)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🤖</div>
+      <span class="trophy-name">Skynet Online (background agents)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">📜</div>
+      <span class="trophy-name">Scribe (60K words of context)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🕵️</div>
+      <span class="trophy-name">Deep Cover (ex-AWX strategy leader interview)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🌏</div>
+      <span class="trophy-name">Portal Opened (devbox, no 2FA)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🧹</div>
+      <span class="trophy-name">Marie Kondo (170→21 open items)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🧬</div>
+      <span class="trophy-name">Evolution (self-improving system)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🗣️</div>
+      <span class="trophy-name">Viral (Nicole adopted the harness)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">⚔️</div>
+      <span class="trophy-name">$42.8M Pipeline Boss (AWX quantified)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🎨</div>
+      <span class="trophy-name">HTML Wizard (first styled report)</span>
+    </div>
+    <div class="trophy earned">
+      <div class="trophy-icon">🔁</div>
+      <span class="trophy-name">5th Time's the Charm (AWX doc iterations)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">🏰</div>
+      <span class="trophy-name">Cloud Fortress (vault synced)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">💚</div>
+      <span class="trophy-name">Full Health (all agents green)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">👥</div>
+      <span class="trophy-name">Guild (3+ team members on harness)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">🌳</div>
+      <span class="trophy-name">Skill Tree Complete (all archetypes used)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">♾️</div>
+      <span class="trophy-name">Perpetual Motion (zero missed crons for 30 days)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">📖</div>
+      <span class="trophy-name">Published (skill on marketplace)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">🎤</div>
+      <span class="trophy-name">Keynote (presented How I Stripe externally)</span>
+    </div>
+    <div class="trophy">
+      <div class="trophy-icon">💯</div>
+      <span class="trophy-name">Century (100 sessions)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHETYPES (SKILL TREE) -->
+<div class="card" style="margin-bottom: 24px;">
+  <h2><span class="icon">🌳</span> Skill Tree (Archetypes)</h2>
+  <div style="padding: 8px 0;">
+    <span class="archetype-chip used"><span class="chip-dot"></span> exec-strategy-doc</span>
+    <span class="archetype-chip used"><span class="chip-dot"></span> competitive-intel-sweep</span>
+    <span class="archetype-chip used"><span class="chip-dot"></span> ingest-synthesize</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> meeting-prep-brief</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> team-update-shipped</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> team-charter-mandate</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> tour-planning</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> one-on-one-prep</span>
+    <span class="archetype-chip"><span class="chip-dot"></span> launch-brief</span>
+  </div>
+  <p style="font-size: 10px; color: #484f58; margin-top: 8px;">Lit = used in a session. Audit: May 26. Goal: all lit by June 23.</p>
+</div>
+
+<!-- RECENT LOOT -->
+<div class="card">
+  <h2><span class="icon">💎</span> Recent Loot (This Session)</h2>
+  <div class="quest" style="border-color: #635BFF30;">
+    <span class="quest-icon">📄</span>
+    <div>
+      <div class="quest-name">tone-stone.md</div>
+      <div class="quest-desc">Calibration artifact for exec doc register</div>
+    </div>
+  </div>
+  <div class="quest" style="border-color: #635BFF30;">
+    <span class="quest-icon">📄</span>
+    <div>
+      <div class="quest-name">open-items.md</div>
+      <div class="quest-desc">Consolidated action list (170 → 21)</div>
+    </div>
+  </div>
+  <div class="quest" style="border-color: #635BFF30;">
+    <span class="quest-icon">🧬</span>
+    <div>
+      <div class="quest-name">9 Archetypes</div>
+      <div class="quest-desc">Reusable patterns for all major work types</div>
+    </div>
+  </div>
+  <div class="quest" style="border-color: #635BFF30;">
+    <span class="quest-icon">⚙️</span>
+    <div>
+      <div class="quest-name">Step 5.5 in /mischief-managed</div>
+      <div class="quest-desc">Self-improvement loop baked into session wrap</div>
+    </div>
+  </div>
+  <div class="quest" style="border-color: #635BFF30;">
+    <span class="quest-icon">🖥️</span>
+    <div>
+      <div class="quest-name">Devbox verified</div>
+      <div class="quest-desc">Claude + Toolshed confirmed working, no 2FA</div>
+    </div>
+  </div>
+</div>
+
+<p class="footer">SAVE POINT: 2026-05-12 • NEXT: /mischief-managed to update</p>
+
+</body>
+</html>
