@@ -2,91 +2,406 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>benssidequests</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12131a;
+    --card-border: #1e2030;
+    --card-hover: #181a24;
+    --text: #e4e4e7;
+    --text-muted: #71717a;
+    --text-dim: #3f3f46;
+    --accent: #f97316;
+    --accent-glow: #f9731630;
+    --purple: #a78bfa;
+    --purple-dim: #635BFF;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Inter', sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; min-height: 100vh; }
 
-  .header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
-  .header h1 { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #58a6ff; text-shadow: 0 0 10px #58a6ff40; }
-  .header .level { background: linear-gradient(135deg, #635BFF, #8b5cf6); padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; color: white; }
-  .xp-bar { width: 200px; height: 8px; background: #1a1a2e; border-radius: 4px; overflow: hidden; margin-left: auto; }
-  .xp-fill { height: 100%; background: linear-gradient(90deg, #635BFF, #a78bfa); width: 72%; border-radius: 4px; }
-  .xp-label { font-size: 10px; color: #666; margin-left: 8px; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 40px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .header .tag {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--purple);
+    font-weight: 500;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  }
 
-  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #635BFF, #58a6ff, #635BFF); opacity: 0.6; }
-  .card h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .card h2 .icon { font-size: 14px; }
+  /* GRID */
+  .grid-main { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .span-2 { grid-column: span 2; }
+  .span-3 { grid-column: span 3; }
 
-  .quest { padding: 10px 12px; margin-bottom: 8px; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-  .quest:hover { border-color: #58a6ff; background: #1c2533; }
-  .quest .quest-icon { font-size: 18px; }
-  .quest .quest-name { font-size: 13px; font-weight: 600; color: #e6edf3; }
-  .quest .quest-desc { font-size: 11px; color: #8b949e; margin-top: 2px; }
-  .quest .quest-status { margin-left: auto; font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
-  .status-active { background: #0d4429; color: #3fb950; border: 1px solid #238636; }
-  .status-blocked { background: #3d1a1a; color: #f85149; border: 1px solid #da3633; }
-  .status-complete { background: #1a1a3d; color: #a78bfa; border: 1px solid #635BFF; }
-  .status-waiting { background: #3d2e00; color: #d29922; border: 1px solid #9e6a03; }
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: #2a2d42;
+    background: var(--card-hover);
+    transform: translateY(-1px);
+  }
+  .card-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label .icon { font-size: 14px; }
 
+  /* BIG COUNTER */
+  .counter-card {
+    background: linear-gradient(135deg, #12131a 0%, #1a1020 100%);
+    border-color: #2a1a3a;
+    text-align: center;
+    padding: 32px 24px;
+  }
+  .counter-card:hover { border-color: var(--accent); }
+  .counter-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent-glow);
+    margin: 8px 0;
+    letter-spacing: -2px;
+    transition: text-shadow 0.3s;
+  }
+  .counter-card:hover .counter-num {
+    text-shadow: 0 0 60px var(--accent-glow), 0 0 100px var(--accent-glow);
+  }
+  .counter-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* STAT PILLS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .stat-pill {
+    background: #0a0a0f;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .stat-pill:hover {
+    border-color: var(--purple-dim);
+    background: #0f0f18;
+  }
+  .stat-pill .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-pill .lbl {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* QUESTS */
+  .quest {
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    background: #0a0a0f;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+  .quest:hover {
+    border-color: var(--purple-dim);
+    background: #0f0f1a;
+    transform: translateX(4px);
+  }
+  .quest-icon { font-size: 18px; }
+  .quest-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .quest-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .quest-status {
+    margin-left: auto;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .status-active { background: #052e16; color: var(--green); border: 1px solid #166534; }
+  .status-blocked { background: #2a0a0a; color: var(--red); border: 1px solid #7f1d1d; }
+  .status-complete { background: #1a1040; color: var(--purple); border: 1px solid #4c1d95; }
+  .status-waiting { background: #2a1f00; color: var(--yellow); border: 1px solid #854d0e; }
+
+  /* CHART */
+  .chart-container { padding: 8px 0; }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 80px;
+    padding: 8px 0;
+  }
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--purple) 0%, var(--purple-dim) 100%);
+    border-radius: 4px 4px 2px 2px;
+    min-height: 2px;
+    transition: all 0.4s ease;
+    animation: barGrow 1s ease-out forwards;
+    transform-origin: bottom;
+    opacity: 0.7;
+  }
+  .bar:hover {
+    opacity: 1;
+    filter: brightness(1.3);
+    transform: scaleY(1.05);
+  }
+  @keyframes barGrow {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  .bar-label { font-size: 9px; color: var(--text-dim); }
+  .bar-val { font-size: 9px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* TROPHIES */
   .trophy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .trophy { text-align: center; padding: 12px 8px; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; }
-  .trophy.earned { border-color: #d4a72c; background: #1c2128; }
+  .trophy {
+    text-align: center;
+    padding: 14px 8px;
+    background: #0a0a0f;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+  .trophy:hover { transform: translateY(-2px); }
+  .trophy.earned { border-color: #854d0e; }
+  .trophy.earned:hover { border-color: var(--yellow); box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1); }
+  .trophy .trophy-icon { font-size: 24px; filter: grayscale(1) opacity(0.2); transition: all 0.3s; }
   .trophy.earned .trophy-icon { filter: none; }
-  .trophy .trophy-icon { font-size: 24px; filter: grayscale(1) opacity(0.3); }
-  .trophy .trophy-name { font-size: 9px; color: #8b949e; margin-top: 4px; display: block; }
-  .trophy.earned .trophy-name { color: #d4a72c; }
+  .trophy:hover .trophy-icon { transform: scale(1.2); }
+  .trophy .trophy-name { font-size: 9px; color: var(--text-dim); margin-top: 6px; display: block; line-height: 1.3; }
+  .trophy.earned .trophy-name { color: var(--text-muted); }
 
-  .stat-row { display: flex; gap: 16px; margin-bottom: 16px; }
-  .stat-box { flex: 1; text-align: center; padding: 12px; background: #1c2128; border-radius: 8px; }
-  .stat-box .num { font-size: 24px; font-weight: 700; color: #e6edf3; font-family: 'Inter', sans-serif; }
-  .stat-box .label { font-size: 10px; color: #8b949e; margin-top: 4px; }
+  /* HEALTH */
+  .health-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-bottom: 1px solid #1a1a22;
+  }
+  .health-item:last-child { border-bottom: none; }
+  .health-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: box-shadow 0.3s;
+  }
+  .health-dot.ok { background: var(--green); }
+  .health-dot.fail { background: var(--red); }
+  .health-dot.warn { background: var(--yellow); }
+  .health-item:hover .health-dot.ok { box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
+  .health-item:hover .health-dot.fail { box-shadow: 0 0 8px rgba(248, 113, 113, 0.5); }
+  .health-item:hover .health-dot.warn { box-shadow: 0 0 8px rgba(251, 191, 36, 0.5); }
 
-  .health-bar { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; }
-  .health-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .health-dot.ok { background: #3fb950; box-shadow: 0 0 6px #3fb95060; }
-  .health-dot.fail { background: #f85149; box-shadow: 0 0 6px #f8514960; }
-  .health-dot.warn { background: #d29922; box-shadow: 0 0 6px #d2992260; }
+  /* ARCHETYPES */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    margin: 3px;
+    background: #0a0a0f;
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .chip:hover { border-color: var(--purple-dim); transform: translateY(-1px); }
+  .chip.active { border-color: var(--purple-dim); color: var(--purple); }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--card-border); }
+  .chip.active .dot { background: var(--purple); box-shadow: 0 0 6px rgba(167, 139, 250, 0.5); }
 
-  .archetype-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; margin: 3px; background: #1c2128; border: 1px solid #30363d; border-radius: 16px; font-size: 11px; }
-  .archetype-chip.used { border-color: #635BFF; color: #a78bfa; }
-  .archetype-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #30363d; }
-  .archetype-chip.used .chip-dot { background: #635BFF; }
+  /* LOOT */
+  .loot-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: #0a0a0f;
+    border: 1px solid var(--card-border);
+    border-left: 3px solid var(--purple-dim);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .loot-item:hover {
+    border-left-color: var(--purple);
+    background: #0f0f1a;
+    transform: translateX(4px);
+  }
+  .loot-icon { font-size: 16px; }
+  .loot-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .loot-desc { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
 
-  .full-width { grid-column: 1 / -1; }
-  .footer { font-size: 10px; color: #30363d; text-align: center; margin-top: 24px; font-family: 'Press Start 2P', monospace; }
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--card-border);
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-  .burn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-  .burn-stat { text-align: center; padding: 12px 8px; background: #1c2128; border-radius: 8px; border: 1px solid #30363d; }
-  .burn-stat .big { font-size: 22px; font-weight: 700; color: #e6edf3; }
-  .burn-stat .big .unit { font-size: 11px; color: #8b949e; font-weight: 400; }
-  .burn-stat .sub { font-size: 10px; color: #8b949e; margin-top: 4px; }
-  .burn-stat.highlight .big { color: #f97316; }
+  /* ANIMATIONS */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
 
-  .spark-row { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-top: 12px; }
-  .spark-bar { flex: 1; background: #635BFF; border-radius: 2px 2px 0 0; min-height: 2px; transition: all 0.3s; }
-  .spark-bar:hover { background: #a78bfa; }
-  .spark-labels { display: flex; justify-content: space-between; font-size: 9px; color: #484f58; margin-top: 4px; }
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🎮 benssidequests</h1>
-  <span class="level">LVL 41</span>
-  <div class="xp-bar"><div class="xp-fill"></div></div>
-  <span class="xp-label">72% to next level</span>
+  <div class="header-left">
+    <h1>benssidequests</h1>
+    <span class="tag">LVL 41</span>
+  </div>
+  <div class="header-right">
+    <span class="live-dot"></span>
+    <span id="clock"></span>
+  </div>
 </div>
 
-<!-- ACTIVE QUESTS -->
-<div class="grid">
-  <div class="card">
-    <h2><span class="icon">🗡️</span> Active Quests</h2>
+<!-- ROW 1: Counter + Quests -->
+<div class="grid-main">
+  <div class="card counter-card fade-in">
+    <div class="card-label"><span class="icon">🔥</span> Tokens Burned</div>
+    <div class="counter-num" id="token-counter">959,096,957</div>
+    <div class="counter-sub">and counting...</div>
+    <div class="stat-grid">
+      <div class="stat-pill">
+        <div class="val">1.8M</div>
+        <div class="lbl">push-ups of energy</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">831</div>
+        <div class="lbl">kilowatt hours</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">5,517</div>
+        <div class="lbl">km of Tesla range</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">5</div>
+        <div class="lbl">bathtubs of water</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim);">≈ $4,183 at Opus rates</div>
+  </div>
+
+  <div class="card span-2 fade-in">
+    <div class="card-label"><span class="icon">🗡️</span> Active Quests</div>
     <div class="quest">
       <span class="quest-icon">📜</span>
       <div>
@@ -128,48 +443,79 @@
       <span class="quest-status status-blocked">NEEDS BEN</span>
     </div>
   </div>
+</div>
 
-  <!-- TOKEN BURN COUNTER -->
-  <div style="display: flex; flex-direction: column; gap: 16px;">
-    <div class="card" style="text-align: center; padding: 24px 16px;">
-      <h2><span class="icon">🔥</span> Tokens Burned</h2>
-      <div id="token-counter" style="font-family: 'Press Start 2P', monospace; font-size: 28px; color: #f97316; text-shadow: 0 0 20px #f9731640; margin: 12px 0; letter-spacing: -1px;">959096957</div>
-      <div style="font-size: 11px; color: #8b949e; margin-bottom: 16px;">and counting...</div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center;">
-        <div style="background: #1c2128; border-radius: 8px; padding: 10px;">
-          <div style="font-size: 16px; font-weight: 700; color: #e6edf3;">1.8M</div>
-          <div style="font-size: 9px; color: #8b949e;">push-ups of energy</div>
-        </div>
-        <div style="background: #1c2128; border-radius: 8px; padding: 10px;">
-          <div style="font-size: 16px; font-weight: 700; color: #e6edf3;">827</div>
-          <div style="font-size: 9px; color: #8b949e;">kilowatt hours</div>
-        </div>
-        <div style="background: #1c2128; border-radius: 8px; padding: 10px;">
-          <div style="font-size: 16px; font-weight: 700; color: #e6edf3;">5,517</div>
-          <div style="font-size: 9px; color: #8b949e;">km of Tesla range</div>
-        </div>
-        <div style="background: #1c2128; border-radius: 8px; padding: 10px;">
-          <div style="font-size: 16px; font-weight: 700; color: #e6edf3;">5</div>
-          <div style="font-size: 9px; color: #8b949e;">bathtubs of water</div>
-        </div>
+<!-- ROW 2: Chart + Dumb Questions + Health -->
+<div class="grid-3">
+  <div class="card fade-in">
+    <div class="card-label"><span class="icon">📈</span> Weekly Burn</div>
+    <div class="bar-chart">
+      <div class="bar-group">
+        <div class="bar-val">$350</div>
+        <div class="bar" style="height: 18%;"></div>
+        <div class="bar-label">W15</div>
       </div>
-      <div style="margin-top: 12px; font-size: 10px; color: #484f58;">≈ $4183 at Opus rates</div>
+      <div class="bar-group">
+        <div class="bar-val">$1.8K</div>
+        <div class="bar" style="height: 100%;"></div>
+        <div class="bar-label">W16</div>
+      </div>
+      <div class="bar-group">
+        <div class="bar-val">$308</div>
+        <div class="bar" style="height: 16%;"></div>
+        <div class="bar-label">W17</div>
+      </div>
+      <div class="bar-group">
+        <div class="bar-val">$927</div>
+        <div class="bar" style="height: 58%;"></div>
+        <div class="bar-label">W18</div>
+      </div>
+      <div class="bar-group">
+        <div class="bar-val">$798</div>
+        <div class="bar" style="height: 54%;"></div>
+        <div class="bar-label">W19</div>
+      </div>
     </div>
-    <div class="card">
-      <h2><span class="icon">❤️</span> System Health</h2>
-      <div class="health-bar"><div class="health-dot fail"></div> Morning Briefing (sc-2fa)</div>
-      <div class="health-bar"><div class="health-dot ok"></div> Nightly Prep</div>
-      <div class="health-bar"><div class="health-dot ok"></div> Catch-up Agent</div>
-      <div class="health-bar"><div class="health-dot fail"></div> Vault Gardener (FDA)</div>
-      <div class="health-bar"><div class="health-dot warn"></div> Devbox Crons (7d expiry)</div>
-      <div class="health-bar"><div class="health-dot fail"></div> Asana API (PAT dead)</div>
+    <div style="font-size: 10px; color: var(--text-dim); margin-top: 8px;">86% cache reads • Peak: W16 (AWX strategy)</div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-label"><span class="icon">🧠</span> Dumb Questions Avoided</div>
+    <div class="stat-grid">
+      <div class="stat-pill">
+        <div class="val">~312</div>
+        <div class="lbl">Slack msgs NOT sent</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">~78h</div>
+        <div class="lbl">Colleague time saved</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">∞</div>
+        <div class="lbl">Dignity preserved</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val">0</div>
+        <div class="lbl">"Per my last email"s</div>
+      </div>
     </div>
+    <div style="font-size: 10px; color: var(--text-dim); margin-top: 12px;">64 hours in Claude Code • Avg session: 101 min</div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-label"><span class="icon">❤️</span> System Health</div>
+    <div class="health-item"><div class="health-dot fail"></div> Morning Briefing (sc-2fa)</div>
+    <div class="health-item"><div class="health-dot ok"></div> Nightly Prep</div>
+    <div class="health-item"><div class="health-dot ok"></div> Catch-up Agent</div>
+    <div class="health-item"><div class="health-dot fail"></div> Vault Gardener (FDA)</div>
+    <div class="health-item"><div class="health-dot warn"></div> Devbox Crons (7d expiry)</div>
+    <div class="health-item"><div class="health-dot fail"></div> Asana API (PAT dead)</div>
   </div>
 </div>
 
-<!-- TROPHIES -->
-<div class="card" style="margin-bottom: 24px;">
-  <h2><span class="icon">🏆</span> Achievements</h2>
+<!-- ROW 3: Trophies -->
+<div class="card fade-in" style="margin-bottom: 16px;">
+  <div class="card-label"><span class="icon">🏆</span> Trophy Case</div>
   <div class="trophy-grid">
     <div class="trophy earned">
       <div class="trophy-icon">🧠</div>
@@ -181,87 +527,87 @@
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🏃</div>
-      <span class="trophy-name">Marathon Runner (15+ deliverables in one session)</span>
+      <span class="trophy-name">Marathon Runner (15+ deliverables)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">💀</div>
-      <span class="trophy-name">Nuke From Orbit (rebuilt from scratch 3x)</span>
+      <span class="trophy-name">Nuke From Orbit (rebuilt 3x)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🧵</div>
-      <span class="trophy-name">Multithreaded (3 parallel sessions)</span>
+      <span class="trophy-name">Multithreaded (3 parallel)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🔮</div>
-      <span class="trophy-name">Architect (Market Context Layer RFC)</span>
+      <span class="trophy-name">Architect (MCL RFC)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🤖</div>
-      <span class="trophy-name">Skynet Online (background agents)</span>
+      <span class="trophy-name">Skynet Online</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">📜</div>
-      <span class="trophy-name">Scribe (60K words of context)</span>
+      <span class="trophy-name">Scribe (60K words)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🕵️</div>
-      <span class="trophy-name">Deep Cover (ex-AWX strategy leader interview)</span>
+      <span class="trophy-name">Deep Cover (AWX intel)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🌏</div>
-      <span class="trophy-name">Portal Opened (devbox, no 2FA)</span>
+      <span class="trophy-name">Portal Opened (devbox)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🧹</div>
-      <span class="trophy-name">Marie Kondo (170→21 open items)</span>
+      <span class="trophy-name">Marie Kondo (170→21)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🧬</div>
-      <span class="trophy-name">Evolution (self-improving system)</span>
+      <span class="trophy-name">Evolution (self-improving)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🗣️</div>
-      <span class="trophy-name">Viral (Nicole adopted the harness)</span>
+      <span class="trophy-name">Viral (Nicole onboard)</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">⚔️</div>
-      <span class="trophy-name">$42.8M Pipeline Boss (AWX quantified)</span>
+      <span class="trophy-name">$42.8M Pipeline Boss</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🎨</div>
-      <span class="trophy-name">HTML Wizard (first styled report)</span>
+      <span class="trophy-name">HTML Wizard</span>
     </div>
     <div class="trophy earned">
       <div class="trophy-icon">🔁</div>
-      <span class="trophy-name">5th Time's the Charm (AWX doc iterations)</span>
+      <span class="trophy-name">5th Time's the Charm</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">🏰</div>
-      <span class="trophy-name">Cloud Fortress (vault synced)</span>
+      <span class="trophy-name">Cloud Fortress</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">💚</div>
-      <span class="trophy-name">Full Health (all agents green)</span>
+      <span class="trophy-name">Full Health</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">👥</div>
-      <span class="trophy-name">Guild (3+ team members on harness)</span>
+      <span class="trophy-name">Guild (3+ members)</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">🌳</div>
-      <span class="trophy-name">Skill Tree Complete (all archetypes used)</span>
+      <span class="trophy-name">Skill Tree Complete</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">♾️</div>
-      <span class="trophy-name">Perpetual Motion (zero missed crons for 30 days)</span>
+      <span class="trophy-name">Perpetual Motion</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">📖</div>
-      <span class="trophy-name">Published (skill on marketplace)</span>
+      <span class="trophy-name">Published</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">🎤</div>
-      <span class="trophy-name">Keynote (presented How I Stripe externally)</span>
+      <span class="trophy-name">Keynote</span>
     </div>
     <div class="trophy">
       <div class="trophy-icon">💯</div>
@@ -270,119 +616,104 @@
   </div>
 </div>
 
-<!-- WEEKLY BURN + DUMB QUESTIONS -->
-<div class="grid" style="margin-bottom: 24px;">
-  <div class="card">
-    <h2><span class="icon">📈</span> Weekly Burn</h2>
-    <div class="spark-row" style="height: 60px;">
-      <div class="spark-bar" style="height: 18%;" title="W15: 76M tokens, $350"></div>
-      <div class="spark-bar" style="height: 100%;" title="W16: 387M tokens, $1,783"></div>
-      <div class="spark-bar" style="height: 16%;" title="W17: 61M tokens, $308"></div>
-      <div class="spark-bar" style="height: 58%;" title="W18: 223M tokens, $927"></div>
-      <div class="spark-bar" style="height: 54%;" title="W19: 208M tokens, $798"></div>
+<!-- ROW 4: Archetypes + Loot -->
+<div class="grid-2">
+  <div class="card fade-in">
+    <div class="card-label"><span class="icon">🌳</span> Skill Tree (Archetypes)</div>
+    <div style="padding: 4px 0;">
+      <span class="chip active"><span class="dot"></span> exec-strategy-doc</span>
+      <span class="chip active"><span class="dot"></span> competitive-intel-sweep</span>
+      <span class="chip active"><span class="dot"></span> ingest-synthesize</span>
+      <span class="chip"><span class="dot"></span> meeting-prep-brief</span>
+      <span class="chip"><span class="dot"></span> team-update-shipped</span>
+      <span class="chip"><span class="dot"></span> team-charter-mandate</span>
+      <span class="chip"><span class="dot"></span> tour-planning</span>
+      <span class="chip"><span class="dot"></span> one-on-one-prep</span>
+      <span class="chip"><span class="dot"></span> launch-brief</span>
     </div>
-    <div class="spark-labels">
-      <span>W15</span><span>W16</span><span>W17</span><span>W18</span><span>W19</span>
-    </div>
-    <p style="font-size: 10px; color: #484f58; margin-top: 8px;">Peak: W16 ($1.8K, heavy AWX strategy week) • 86% cache reads</p>
+    <div style="font-size: 10px; color: var(--text-dim); margin-top: 10px;">Goal: all lit by June 23</div>
   </div>
-  <div class="card">
-    <h2><span class="icon">🧠</span> Dumb Questions Avoided</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-      <div style="background: #1c2128; border-radius: 8px; padding: 10px; text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #e6edf3;">~312</div>
-        <div style="font-size: 9px; color: #8b949e;">Slack msgs NOT sent</div>
+
+  <div class="card fade-in">
+    <div class="card-label"><span class="icon">💎</span> Recent Loot</div>
+    <div class="loot-item">
+      <span class="loot-icon">📄</span>
+      <div>
+        <div class="loot-name">tone-stone.md</div>
+        <div class="loot-desc">Exec doc tone calibration</div>
       </div>
-      <div style="background: #1c2128; border-radius: 8px; padding: 10px; text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #e6edf3;">~78hrs</div>
-        <div style="font-size: 9px; color: #8b949e;">Colleague time saved</div>
+    </div>
+    <div class="loot-item">
+      <span class="loot-icon">📄</span>
+      <div>
+        <div class="loot-name">open-items.md</div>
+        <div class="loot-desc">Consolidated (170 → 21)</div>
       </div>
-      <div style="background: #1c2128; border-radius: 8px; padding: 10px; text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #e6edf3;">∞</div>
-        <div style="font-size: 9px; color: #8b949e;">Dignity preserved</div>
+    </div>
+    <div class="loot-item">
+      <span class="loot-icon">🧬</span>
+      <div>
+        <div class="loot-name">9 Archetypes</div>
+        <div class="loot-desc">Reusable work patterns</div>
       </div>
-      <div style="background: #1c2128; border-radius: 8px; padding: 10px; text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #e6edf3;">0</div>
-        <div style="font-size: 9px; color: #8b949e;">"Per my last email"s</div>
+    </div>
+    <div class="loot-item">
+      <span class="loot-icon">⚙️</span>
+      <div>
+        <div class="loot-name">Step 5.5 self-improvement</div>
+        <div class="loot-desc">Session wrap loop</div>
+      </div>
+    </div>
+    <div class="loot-item">
+      <span class="loot-icon">🖥️</span>
+      <div>
+        <div class="loot-name">Devbox verified</div>
+        <div class="loot-desc">Claude + Toolshed, no 2FA</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ARCHETYPES (SKILL TREE) -->
-<div class="card" style="margin-bottom: 24px;">
-  <h2><span class="icon">🌳</span> Skill Tree (Archetypes)</h2>
-  <div style="padding: 8px 0;">
-    <span class="archetype-chip used"><span class="chip-dot"></span> exec-strategy-doc</span>
-    <span class="archetype-chip used"><span class="chip-dot"></span> competitive-intel-sweep</span>
-    <span class="archetype-chip used"><span class="chip-dot"></span> ingest-synthesize</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> meeting-prep-brief</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> team-update-shipped</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> team-charter-mandate</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> tour-planning</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> one-on-one-prep</span>
-    <span class="archetype-chip"><span class="chip-dot"></span> launch-brief</span>
-  </div>
-  <p style="font-size: 10px; color: #484f58; margin-top: 8px;">Lit = used in a session. Audit: May 26. Goal: all lit by June 23.</p>
-</div>
-
-<!-- RECENT LOOT -->
-<div class="card">
-  <h2><span class="icon">💎</span> Recent Loot (This Session)</h2>
-  <div class="quest" style="border-color: #635BFF30;">
-    <span class="quest-icon">📄</span>
-    <div>
-      <div class="quest-name">tone-stone.md</div>
-      <div class="quest-desc">Calibration artifact for exec doc register</div>
-    </div>
-  </div>
-  <div class="quest" style="border-color: #635BFF30;">
-    <span class="quest-icon">📄</span>
-    <div>
-      <div class="quest-name">open-items.md</div>
-      <div class="quest-desc">Consolidated action list (170 → 21)</div>
-    </div>
-  </div>
-  <div class="quest" style="border-color: #635BFF30;">
-    <span class="quest-icon">🧬</span>
-    <div>
-      <div class="quest-name">9 Archetypes</div>
-      <div class="quest-desc">Reusable patterns for all major work types</div>
-    </div>
-  </div>
-  <div class="quest" style="border-color: #635BFF30;">
-    <span class="quest-icon">⚙️</span>
-    <div>
-      <div class="quest-name">Step 5.5 in /mischief-managed</div>
-      <div class="quest-desc">Self-improvement loop baked into session wrap</div>
-    </div>
-  </div>
-  <div class="quest" style="border-color: #635BFF30;">
-    <span class="quest-icon">🖥️</span>
-    <div>
-      <div class="quest-name">Devbox verified</div>
-      <div class="quest-desc">Claude + Toolshed confirmed working, no 2FA</div>
-    </div>
-  </div>
-</div>
-
-<p class="footer">SAVE POINT: 2026-05-12 • NEXT: /mischief-managed to update</p>
+<div class="footer">SAVE POINT: 2026-05-12 • benssidequests v2.0</div>
 
 <script>
 (function() {
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) + ' AEST';
+    setTimeout(updateClock, 1000);
+  }
+  updateClock();
+
+  // Token counter
   const counter = document.getElementById('token-counter');
   const baseTokens = 959096957;
-  const baseTime = new Date('2026-05-12T08:41:42+00:00').getTime();
-  // ~19M tokens per session, ~1.5 sessions per day = ~28.5M tokens/day = ~330 tokens/sec avg
+  const baseTime = new Date('2026-05-12T06:28:24+00:00').getTime();
   const tokensPerMs = 330 / 1000;
 
-  function update() {
+  function updateCounter() {
     const elapsed = Date.now() - baseTime;
     const current = Math.floor(baseTokens + (elapsed * tokensPerMs));
     counter.textContent = current.toLocaleString();
-    requestAnimationFrame(update);
+    requestAnimationFrame(updateCounter);
   }
-  update();
+  updateCounter();
+
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animationPlayState = 'running';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => {
+    el.style.animationPlayState = 'paused';
+    observer.observe(el);
+  });
 })();
 </script>
 
