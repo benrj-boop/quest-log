@@ -60,6 +60,18 @@
 
   .full-width { grid-column: 1 / -1; }
   .footer { font-size: 10px; color: #30363d; text-align: center; margin-top: 24px; font-family: 'Press Start 2P', monospace; }
+
+  .burn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .burn-stat { text-align: center; padding: 12px 8px; background: #1c2128; border-radius: 8px; border: 1px solid #30363d; }
+  .burn-stat .big { font-size: 22px; font-weight: 700; color: #e6edf3; }
+  .burn-stat .big .unit { font-size: 11px; color: #8b949e; font-weight: 400; }
+  .burn-stat .sub { font-size: 10px; color: #8b949e; margin-top: 4px; }
+  .burn-stat.highlight .big { color: #f97316; }
+
+  .spark-row { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-top: 12px; }
+  .spark-bar { flex: 1; background: #635BFF; border-radius: 2px 2px 0 0; min-height: 2px; transition: all 0.3s; }
+  .spark-bar:hover { background: #a78bfa; }
+  .spark-labels { display: flex; justify-content: space-between; font-size: 9px; color: #484f58; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -243,6 +255,59 @@
       <span class="trophy-name">Century (100 sessions)</span>
     </div>
   </div>
+</div>
+
+<!-- TOKEN BURN RATE -->
+<div class="card" style="margin-bottom: 24px;">
+  <h2><span class="icon">🔥</span> Token Burn Rate</h2>
+  <div class="burn-grid">
+    <div class="burn-stat highlight">
+      <div class="big">956<span class="unit">M</span></div>
+      <div class="sub">Total tokens</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">$4.2<span class="unit">K</span></div>
+      <div class="sub">Est. total cost</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">50</div>
+      <div class="sub">Sessions</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">19.1<span class="unit">M</span></div>
+      <div class="sub">Avg per session</div>
+    </div>
+  </div>
+  <div class="burn-grid">
+    <div class="burn-stat">
+      <div class="big">1.1<span class="unit">M</span></div>
+      <div class="sub">Input tokens</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">2.0<span class="unit">M</span></div>
+      <div class="sub">Output tokens</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">131<span class="unit">M</span></div>
+      <div class="sub">Cache write</div>
+    </div>
+    <div class="burn-stat">
+      <div class="big">821<span class="unit">M</span></div>
+      <div class="sub">Cache read</div>
+    </div>
+  </div>
+  <h2 style="margin-top: 16px;"><span class="icon">📈</span> Weekly Burn (last 5 weeks)</h2>
+  <div class="spark-row">
+    <div class="spark-bar" style="height: 18%;" title="W15: 76M tokens, $350"></div>
+    <div class="spark-bar" style="height: 100%;" title="W16: 387M tokens, $1,783"></div>
+    <div class="spark-bar" style="height: 16%;" title="W17: 61M tokens, $308"></div>
+    <div class="spark-bar" style="height: 58%;" title="W18: 223M tokens, $927"></div>
+    <div class="spark-bar" style="height: 54%;" title="W19: 208M tokens, $798"></div>
+  </div>
+  <div class="spark-labels">
+    <span>W15</span><span>W16</span><span>W17</span><span>W18</span><span>W19</span>
+  </div>
+  <p style="font-size: 10px; color: #484f58; margin-top: 12px;">Model: claude-opus-4-6 • 86% of tokens are cache reads (efficient!) • Peak: W16 ($1.8K, heavy AWX strategy week)</p>
 </div>
 
 <!-- ARCHETYPES (SKILL TREE) -->
