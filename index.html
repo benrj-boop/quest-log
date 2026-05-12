@@ -133,7 +133,7 @@
   <div style="display: flex; flex-direction: column; gap: 16px;">
     <div class="card" style="text-align: center; padding: 24px 16px;">
       <h2><span class="icon">🔥</span> Tokens Burned</h2>
-      <div style="font-family: 'Press Start 2P', monospace; font-size: 28px; color: #f97316; text-shadow: 0 0 20px #f9731640; margin: 12px 0; letter-spacing: -1px;">955,725,698</div>
+      <div id="token-counter" style="font-family: 'Press Start 2P', monospace; font-size: 28px; color: #f97316; text-shadow: 0 0 20px #f9731640; margin: 12px 0; letter-spacing: -1px;">955,725,698</div>
       <div style="font-size: 11px; color: #8b949e; margin-bottom: 16px;">and counting...</div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center;">
         <div style="background: #1c2128; border-radius: 8px; padding: 10px;">
@@ -367,6 +367,24 @@
 </div>
 
 <p class="footer">SAVE POINT: 2026-05-12 • NEXT: /mischief-managed to update</p>
+
+<script>
+(function() {
+  const counter = document.getElementById('token-counter');
+  const baseTokens = 955725698;
+  const baseTime = new Date('2026-05-12T15:30:00+10:00').getTime();
+  // ~19M tokens per session, ~1.5 sessions per day = ~28.5M tokens/day = ~330 tokens/sec avg
+  const tokensPerMs = 330 / 1000;
+
+  function update() {
+    const elapsed = Date.now() - baseTime;
+    const current = Math.floor(baseTokens + (elapsed * tokensPerMs));
+    counter.textContent = current.toLocaleString();
+    requestAnimationFrame(update);
+  }
+  update();
+})();
+</script>
 
 </body>
 </html>
