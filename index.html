@@ -111,6 +111,7 @@
     gap: 8px;
   }
   .card-label .icon { font-size: 16px; }
+  .card-desc { font-size: 11px; color: var(--text-muted); margin: -8px 0 14px 0; line-height: 1.4; }
 
   /* BIG COUNTER */
   .counter-card {
@@ -377,6 +378,7 @@
 <div class="grid-main">
   <div class="card counter-card fade-in">
     <div class="card-label"><span class="icon">🔥</span> Tokens Burned</div>
+    <div class="card-desc">Total AI compute used across all sessions. Each token is roughly a word fragment processed by Claude.</div>
     <div class="counter-num" id="token-counter">959,096,957</div>
     <div class="counter-sub">and counting...</div>
     <div class="stat-grid">
@@ -402,6 +404,7 @@
 
   <div class="card span-2 fade-in">
     <div class="card-label"><span class="icon">🗡️</span> Active Quests</div>
+    <div class="card-desc">Current workstreams being tracked. Updated at each session wrap.</div>
     <div class="quest">
       <span class="quest-icon">📜</span>
       <div>
@@ -449,6 +452,7 @@
 <div class="grid-3">
   <div class="card fade-in">
     <div class="card-label"><span class="icon">📥</span> /ingest</div>
+    <div class="card-desc">Feeds docs, notes, and links into Claude's persistent memory layer for later recall.</div>
     <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;">
       <span style="font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: var(--text);">69</span>
       <span style="font-size: 12px; color: var(--text-muted);">invocations</span>
@@ -466,6 +470,7 @@
   </div>
   <div class="card fade-in">
     <div class="card-label"><span class="icon">✨</span> /mischief-managed</div>
+    <div class="card-desc">End-of-session ritual. Logs work done, syncs state, sends summary to Slack, fires a notification.</div>
     <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;">
       <span style="font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: var(--text);">75</span>
       <span style="font-size: 12px; color: var(--text-muted);">sessions wrapped</span>
@@ -483,6 +488,7 @@
   </div>
   <div class="card fade-in">
     <div class="card-label"><span class="icon">☀️</span> /sup</div>
+    <div class="card-desc">Morning briefing. Pulls calendar, Slack highlights, and open items into a daily rundown.</div>
     <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;">
       <span style="font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: var(--text);">48</span>
       <span style="font-size: 12px; color: var(--text-muted);">sups supped</span>
@@ -504,6 +510,7 @@
 <div class="grid-3">
   <div class="card fade-in">
     <div class="card-label"><span class="icon">📈</span> Weekly Burn</div>
+    <div class="card-desc">Estimated cost per week based on token usage at Opus API rates.</div>
     <div class="bar-chart">
       <div class="bar-group">
         <div class="bar-val">$350</div>
@@ -536,6 +543,7 @@
 
   <div class="card fade-in">
     <div class="card-label"><span class="icon">🧠</span> Dumb Questions Avoided</div>
+    <div class="card-desc">Things Ben didn't have to ask a human because Claude already knew.</div>
     <div class="stat-grid">
       <div class="stat-pill">
         <div class="val">~312</div>
@@ -559,6 +567,7 @@
 
   <div class="card fade-in">
     <div class="card-label"><span class="icon">❤️</span> System Health</div>
+    <div class="card-desc">Background agents and automations. Green = running, red = broken.</div>
     <div class="health-item"><div class="health-dot fail"></div> Morning Briefing (sc-2fa)</div>
     <div class="health-item"><div class="health-dot ok"></div> Nightly Prep</div>
     <div class="health-item"><div class="health-dot ok"></div> Catch-up Agent</div>
@@ -571,6 +580,7 @@
 <!-- ROW 3: Trophies -->
 <div class="card fade-in" style="margin-bottom: 16px;">
   <div class="card-label"><span class="icon">🏆</span> Trophy Case</div>
+  <div class="card-desc">Milestones unlocked along the way. Gold = earned, grey = still locked.</div>
   <div class="trophy-grid">
     <div class="trophy earned">
       <div class="trophy-icon">🧠</div>
@@ -675,6 +685,7 @@
 <div class="grid-2">
   <div class="card fade-in">
     <div class="card-label"><span class="icon">🌳</span> Skill Tree (Archetypes)</div>
+    <div class="card-desc">Reusable templates for repeated work types. Lit = used in a real session.</div>
     <div style="padding: 4px 0;">
       <span class="chip active"><span class="dot"></span> exec-strategy-doc</span>
       <span class="chip active"><span class="dot"></span> competitive-intel-sweep</span>
@@ -691,6 +702,7 @@
 
   <div class="card fade-in">
     <div class="card-label"><span class="icon">💎</span> Recent Loot</div>
+    <div class="card-desc">Artifacts produced in the most recent session.</div>
     <div class="loot-item">
       <span class="loot-icon">📄</span>
       <div>
@@ -729,7 +741,12 @@
   </div>
 </div>
 
-<div class="footer">SAVE POINT: 2026-05-12 • benssidequests v2.0</div>
+<div class="footer">
+  SAVE POINT: 2026-05-12 • benssidequests v2.0
+  <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">
+    <a href="https://docs.google.com/document/d/1t_hA7WvNdq0_5gGfgZYYE4gSyychKFXYUAohH3V94LI" target="_blank" style="color: var(--purple); text-decoration: none; font-family: 'Space Grotesk', sans-serif;">Read the full write-up: How I Stripe →</a>
+  </div>
+</div>
 
 <script>
 (function() {
