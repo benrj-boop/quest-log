@@ -686,19 +686,42 @@
   }
   updateClock();
 
-  // Token counter
+  // Token counter — sporadic bursts like real inference
   const counter = document.getElementById('token-counter');
   const baseTokens = 959096957;
   const baseTime = new Date('2026-05-12T06:28:24+00:00').getTime();
-  const tokensPerMs = 330 / 1000;
+  const avgTokensPerSec = 330;
+  let displayTokens = baseTokens + Math.floor((Date.now() - baseTime) / 1000 * avgTokensPerSec);
+  let targetTokens = displayTokens;
 
-  function updateCounter() {
-    const elapsed = Date.now() - baseTime;
-    const current = Math.floor(baseTokens + (elapsed * tokensPerMs));
-    counter.textContent = current.toLocaleString();
-    requestAnimationFrame(updateCounter);
+  // Schedule random bursts
+  function scheduleBurst() {
+    const idleTime = 2000 + Math.random() * 6000; // 2-8s of nothing
+    setTimeout(() => {
+      // Burst: 500-50000 tokens (small cache read vs big output)
+      const burstSize = Math.random() < 0.3
+        ? Math.floor(10000 + Math.random() * 40000)  // big burst (30% chance)
+        : Math.floor(500 + Math.random() * 5000);    // small burst (70% chance)
+      targetTokens += burstSize;
+      scheduleBurst();
+    }, idleTime);
   }
-  updateCounter();
+  scheduleBurst();
+
+  // Animate display toward target (fast tick-up during bursts)
+  function renderCounter() {
+    if (displayTokens < targetTokens) {
+      const gap = targetTokens - displayTokens;
+      const step = Math.max(1, Math.floor(gap * 0.08)); // ease toward target
+      displayTokens += step;
+      counter.style.textShadow = '0 0 60px var(--accent-glow), 0 0 100px var(--accent-glow)';
+    } else {
+      counter.style.textShadow = '0 0 40px var(--accent-glow)';
+    }
+    counter.textContent = displayTokens.toLocaleString();
+    requestAnimationFrame(renderCounter);
+  }
+  renderCounter();
 
   // Fade-in on scroll
   const observer = new IntersectionObserver((entries) => {
