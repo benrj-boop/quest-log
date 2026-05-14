@@ -761,7 +761,7 @@
   // Token counter — sporadic bursts like real inference
   const counter = document.getElementById('token-counter');
   const baseTokens = 945893796;
-  const baseTime = new Date('2026-05-14T03:38:40+00:00').getTime();
+  const baseTime = new Date('2026-05-14T03:40:59+00:00').getTime();
   const avgTokensPerSec = 330;
   let displayTokens = baseTokens + Math.floor((Date.now() - baseTime) / 1000 * avgTokensPerSec);
   let targetTokens = displayTokens;
